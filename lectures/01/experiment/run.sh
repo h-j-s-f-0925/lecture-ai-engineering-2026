@@ -23,14 +23,24 @@ else
   models=(gemini-3.5-flash-lite gemini-3.5-flash)
 fi
 
-# レポートの保存先。Markdown形式の成果物なので reports フォルダーに保存する。
-report_dir="lectures/01/experiment/reports"
+# AIE_TEMPERATURE が設定されていれば、CLI用の引数配列へ追加する。
+temperature_args=() # 空配列なら、各実行でtemperatureオプションを省略する。
+if [[ -n "${AIE_TEMPERATURE:-}" ]]; then # 未設定変数を避けながら温度指定の有無を調べる。
+  temperature_args=(--temperature "$AIE_TEMPERATURE") # 値を分割せず、オプションの引数として保持する。
+  temperature_display="$AIE_TEMPERATURE" # 進捗ログとレポートに同じ温度表記を使う。
+else
+  temperature_display="モデル既定値" # 未指定であることが分かるようログに明記する。
+fi # 温度指定がない場合も空配列のまま処理を続ける。
+
+# 第1回の実験結果専用の保存先。調査レポート用のルート research/ とは分けている。
+report_dir="lectures/01/experiment/reports" # 生成した実験レポートをまとめて保存する場所。
 # -p は親ディレクトリも作り、既にフォルダがあってもエラーにしない。
 # 実験結果を残すフォルダを用意する。
 mkdir -p "$report_dir"
 # mktemp は実行ごとに異なる一時ファイル名を作る。
-# date -u はUTC時刻を使い、XXXXXX は mktemp が一意な文字列に置き換える。
-report_file="$(mktemp "$report_dir/experiment-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX.md")"
+# TZ指定はこのdateコマンドだけに適用し、JSTの年月日時分をファイル名の先頭に付ける。
+# mktempが末尾のXXXXXXを一意な文字列に置き換える。
+report_file="$(mktemp "$report_dir/$(TZ=Asia/Tokyo date +%Y%m%d_%H%M)_experiment-XXXXXX.md")"
 # 回答を一時保存する場所。最後にサマリー表を先頭に付けてレポートを組み立てる。
 temp_dir="$(mktemp -d "$report_dir/.experiment-XXXXXX")"
 # スクリプト終了時（成功・失敗・中断時）に、作成した一時ディレクトリを片付ける。
@@ -55,13 +65,15 @@ had_error=0
 # models 配列に入っているモデルを1つずつ取り出し、同じ質問を3回実行する。
 for model in "${models[@]}"; do
   for run in 1 2 3; do
-    # API 呼び出し中であることが分かるよう、進捗は標準エラーへ表示する。
-    printf '実行中: model=%s / %s回目\n' "$model" "$run" >&2
+    # API 呼び出し前に、モデル・温度・試行回数を標準エラーへ表示する。
+    printf '実行中: model=%s / temperature=%s / %s回目\n' \
+      "$model" "$temperature_display" "$run" >&2
     output_file="$temp_dir/result-${#run_models[@]}.txt"
 
     # このコマンドだけ AIE_MODEL に model の値を設定する。
     # 出力を一時ファイルへ保存し、後でサマリーと本文を分けてレポートにまとめる。
-    if AIE_MODEL="$model" uv run python -m app.ask "$question" > "$output_file" 2>&1; then
+    # モデルと温度を一時指定し、標準出力・標準エラーを結果ファイルに集める。
+    if AIE_MODEL="$model" uv run python -m app.ask "$question" "${temperature_args[@]}" > "$output_file" 2>&1; then
       run_status="成功"
     else
       # 失敗時もエラー出力をレポートに残し、残りの実行は続ける。
@@ -93,8 +105,9 @@ done
 
 # 先にサマリー表を作る。固定のタイトル・見出しはテンプレート側で管理する。
 {
-  printf '| モデル | 実行回数 | 成功 / 失敗 | 入力トークン数（1 / 2 / 3回目） | 出力トークン数（1 / 2 / 3回目） | 平均出力トークン数 |\n'
-  printf '|---|---:|---:|---|---|---:|\n'
+  # 進捗ログと同じ温度表記を使い、未指定時も条件を判別できるようにする。
+  printf '| モデル | temperature | 実行回数 | 成功 / 失敗 | 入力トークン数（1 / 2 / 3回目） | 出力トークン数（1 / 2 / 3回目） | 平均出力トークン数 |\n'
+  printf '|---|---:|---:|---:|---|---|---:|\n'
   for model_index in "${!models[@]}"; do
     first_run_index=$((model_index * 3))
     success_count=0
@@ -122,8 +135,9 @@ done
     else
       average_display="不明（0回分）"
     fi
-    printf '| %s | 3 | %s / %s | %s / %s / %s | %s / %s / %s | %s |\n' \
+    printf '| %s | %s | 3 | %s / %s | %s / %s / %s | %s / %s / %s | %s |\n' \
       "${models[$model_index]}" \
+      "$temperature_display" \
       "$success_count" \
       "$failure_count" \
       "${input_tokens[$first_run_index]}" \
@@ -138,11 +152,19 @@ done
 
 # 実行ごとに変わる条件を作る。テンプレートに含めず、ここで値をそのまま出力する。
 {
-  # date -u -Is はタイムゾーン付きのISO形式で現在時刻を表示する。
-  printf -- '- 実行日時（UTC）: %s\n' "$(date -u -Is)"
+  # JSTを指定して、タイムゾーン付きのISO形式で現在時刻を表示する。
+  # JSTのオフセット付き日時を、実験時刻として記録する。
+  printf -- '- 実行日時（JST）: %s\n' "$(TZ=Asia/Tokyo date -Is)"
+  # 実行条件として、共通質問・試行数・モデルを残す。
   printf -- '- 質問: %s\n' "$question"
   printf -- '- 各モデルの実行回数: 3\n'
   printf -- '- モデル: %s\n' "${models[*]}"
+  # 温度の指定値、またはモデルの既定値を条件欄に記録する。
+  if [[ -n "${AIE_TEMPERATURE:-}" ]]; then
+    printf -- '- temperature: %s\n' "$AIE_TEMPERATURE"
+  else
+    printf -- '- temperature: モデル既定値\n'
+  fi # 条件欄へのtemperature記録を終える。
 } > "$conditions_file"
 
 # モデルの回答は置換コマンドを通さず、折りたたみブロックとしてそのまま書き出す。

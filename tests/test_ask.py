@@ -1,3 +1,5 @@
+# CLI引数をテスト中に差し替えるために使う。
+import sys
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -67,3 +69,37 @@ def test_ask_reports_unavailable_token_counts(monkeypatch, capsys):
     assert ask_module.ask("質問") == "回答"
     generate_content.assert_called_once_with(model=ask_module.MODEL, contents="質問")
     assert "[トークン] 入力: 不明 / 出力: 不明" in capsys.readouterr().out
+
+
+def test_ask_passes_temperature_in_generate_content_config(monkeypatch):
+    """temperature が指定された場合、GenerateContentConfig 経由で SDK に渡す。"""
+    # 実API応答の代わりを用意し、通信しない偽クライアントを設定する。
+    response = SimpleNamespace(usage_metadata=None, text="回答")
+    generate_content = _patch_client(monkeypatch, response)
+
+    # 指定温度でも回答文を返すことを確認する。
+    assert ask_module.ask("質問", temperature=0.7) == "回答"
+
+    # SDKが1回だけ呼ばれ、モデル・質問・温度設定が正しく渡ることを確認する。
+    generate_content.assert_called_once()
+    call = generate_content.call_args
+    assert call.kwargs["model"] == ask_module.MODEL
+    assert call.kwargs["contents"] == "質問"
+    assert isinstance(call.kwargs["config"], types.GenerateContentConfig)
+    assert call.kwargs["config"].temperature == 0.7
+
+
+def test_main_passes_temperature_option_to_ask(monkeypatch, capsys):
+    """CLI の --temperature が ask() に渡され、設定値が表示される。"""
+    # API通信なしでCLIの呼び出しを検証するため、ask()を偽物へ置き換える。
+    ask = Mock(return_value="回答")
+    monkeypatch.setattr(ask_module, "ask", ask)
+    # main()が受け取るコマンドライン引数をテスト用の値にする。
+    monkeypatch.setattr(sys, "argv", ["app.ask", "--temperature", "0.7", "質問"])
+
+    # 模擬した引数でCLIの入口を実行する。
+    ask_module.main()
+
+    # CLIから質問と数値化した温度が渡され、温度も画面に表示されることを確認する。
+    ask.assert_called_once_with("質問", temperature=0.7)
+    assert "[temperature] 0.7" in capsys.readouterr().out
