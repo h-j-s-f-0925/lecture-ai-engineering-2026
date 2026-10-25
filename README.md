@@ -30,6 +30,12 @@ uv run pytest -q
 uv run python -m app.ask "LoRAとは何ですか？"
 ```
 
+引数なしで起動すると対話モードになり、前の質問・回答を踏まえて続けて質問できます。`/exit` または `/quit` で終了します。各ターンで、過去の会話だけのトークン数と、今回の質問を含む入力全体・回答のトークン数を表示します。履歴トークン数の計測には、履歴があるターンごとにGeminiの計数APIを追加で呼び出します。
+
+```bash
+uv run python -m app.ask
+```
+
 詳しい手順は [lectures/01/problem.md](lectures/01/problem.md) を見てください。
 
 ## 構成
