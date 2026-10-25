@@ -1,0 +1,7 @@
+{
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "機能開発・バグ修正・リファクタリングなど通常のソフトウェア変更では Conventional Commits に従い、<type>(<scope>): <日本語の簡潔で具体的な要約> としてください。type は feat、fix、docs、refactor、test、chore などから選び、scope は必要な場合だけ付けます。講義・演習・実験・試行錯誤など学習の記録や成果に関する変更では Conventional Commits の接頭辞を付けず、第〇回 <講義|演習|宿題|実験>: <日本語の簡潔で具体的な要約> としてください。例: 第1回 宿題: temperature比較手順を追加。細かな変更を列挙せず、目的と主な成果を短く表してください。"
+    }
+  ]
+}
