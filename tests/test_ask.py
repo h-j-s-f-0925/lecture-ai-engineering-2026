@@ -108,7 +108,9 @@ def test_main_passes_temperature_option_to_ask(monkeypatch, capsys):
 
     # CLIから質問と数値化した温度が渡され、温度も画面に表示されることを確認する。
     ask.assert_called_once_with("質問", temperature=0.7)
-    assert "[temperature] 0.7" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "[temperature] 0.7" in output
+    assert "[mode] 単発質問（会話履歴なし）" in output
 
 
 def test_interactive_mode_sends_previous_turns(monkeypatch, capsys):
@@ -181,6 +183,7 @@ def test_interactive_mode_sends_previous_turns(monkeypatch, capsys):
     assert "最初の回答" in output
     assert "続きの回答" in output
     assert "[トークン] 履歴: 11 / 入力全体: 20 / 出力: 4" in output
+    assert "[mode] 対話" in output
 
 
 # pytest.mark.parametrize("関数の引数名", [値1, 値2])を付けると、
