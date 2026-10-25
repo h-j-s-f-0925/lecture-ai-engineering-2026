@@ -25,7 +25,8 @@ def ask(question: str) -> str:
     client = genai.Client(api_key=get_api_key())
     response = client.models.generate_content(model=MODEL, contents=question)
 
-    # SDKの利用量メタデータでは、入力が prompt、生成出力が candidates の各トークン数に対応する。
+    # Google Gen AI Python SDK（google-genai）の利用量情報では、入力が prompt、
+    # 生成出力が candidates の各トークン数に対応する。
     usage = response.usage_metadata
     input_tokens = usage.prompt_token_count if usage is not None else None
     output_tokens = usage.candidates_token_count if usage is not None else None
