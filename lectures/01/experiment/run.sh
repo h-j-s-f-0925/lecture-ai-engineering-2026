@@ -32,6 +32,12 @@ else
   temperature_display="モデル既定値" # 未指定であることが分かるようログに明記する。
 fi # 温度指定がない場合も空配列のまま処理を続ける。
 
+# 連続リクエストが短時間に集中しないよう、各実行の間に2秒待つ。
+request_interval_seconds=2
+# 対象モデル数と各モデル3回の試行から、待機が不要な最後の実行を判定する。
+total_runs=$((${#models[@]} * 3))
+completed_runs=0
+
 # 第1回の実験結果専用の保存先。調査レポート用のルート research/ とは分けている。
 report_dir="lectures/01/experiment/reports" # 生成した実験レポートをまとめて保存する場所。
 # -p は親ディレクトリも作り、既にフォルダがあってもエラーにしない。
@@ -81,8 +87,11 @@ for model in "${models[@]}"; do
       had_error=1
     fi
 
-    # [トークン] 行から入力・出力トークン数を取り出す。
-    tokens="$(sed -n 's/.*\[トークン\] 入力: \([^ ]*\) \/ 出力: \([^ ]*\).*/\1 \2/p' "$output_file")"
+    # 現行・旧形式どちらの[トークン]行からも入力全体と出力の数を取り出す。
+    tokens="$(sed -n \
+      -e 's/.*\[トークン\] 履歴: [^ ]* \/ 入力全体: \([^ ]*\) \/ 出力: \([^ ]*\).*/\1 \2/p' \
+      -e 's/.*\[トークン\] 入力: \([^ ]*\) \/ 出力: \([^ ]*\).*/\1 \2/p' \
+      "$output_file")"
     if [[ -n "$tokens" ]]; then
       read -r input_count output_count <<< "$tokens"
       # トークン情報の行より後を回答本文として残し、CLIの重複する見出しは除く。
@@ -100,6 +109,14 @@ for model in "${models[@]}"; do
     output_tokens+=("$output_count")
     run_statuses+=("$run_status")
     answers+=("$answer")
+
+    # 最後の実行以外の場合
+    if ((completed_runs + 1 < total_runs)); then
+      # 次のAPIリクエストまで指定秒数だけ待ち、短時間の連続呼び出しを避ける。
+      sleep "$request_interval_seconds"
+    fi
+    # 待機の要否を次の繰り返しで判定できるよう、今回の実行を数える。
+    completed_runs=$((completed_runs + 1))
   done
 done
 
@@ -159,6 +176,7 @@ done
   printf -- '- 質問: %s\n' "$question"
   printf -- '- 各モデルの実行回数: 3\n'
   printf -- '- モデル: %s\n' "${models[*]}"
+  printf -- '- APIリクエスト間の待機時間: %s秒\n' "$request_interval_seconds"
   # 温度の指定値、またはモデルの既定値を条件欄に記録する。
   if [[ -n "${AIE_TEMPERATURE:-}" ]]; then
     printf -- '- temperature: %s\n' "$AIE_TEMPERATURE"

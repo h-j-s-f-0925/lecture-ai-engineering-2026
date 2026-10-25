@@ -183,9 +183,13 @@ def main() -> None:
     try:
         # 質問文が指定されていない場合
         if args.question is None:
+            # 前の質問を引き継ぐ対話モードであることをターミナルに示す。
+            print("[mode] 対話")
             run_interactive(temperature=args.temperature)
         # 質問文が指定されている場合
         else:
+            # この起動だけで完結する単発モードであることをターミナルに示す。
+            print("[mode] 単発質問（会話履歴なし）")
             # 単発実行の入力と回答を対応づけて表示する。
             print(f"[質問] {args.question}\n")
             # 指定された条件で1回だけモデルに質問する。
