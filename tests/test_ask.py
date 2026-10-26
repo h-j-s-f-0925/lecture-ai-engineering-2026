@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
-from google.genai import types
+from google.genai import errors, types
 
 import app.ask as ask_module
 
@@ -75,6 +75,51 @@ def test_ask_reports_unavailable_token_counts(monkeypatch, capsys):
     generate_content.assert_called_once_with(model=ask_module.MODEL, contents="質問")
     assert "[トークン] 履歴: 0 / 入力全体: 不明 / 出力: 不明" in capsys.readouterr().out
     count_tokens.assert_not_called()
+
+
+def test_ask_with_metrics_measures_only_generate_content(monkeypatch):
+    """計測時間は生成APIを呼び出す直前から応答直後までを示す。"""
+    response = SimpleNamespace(
+        usage_metadata=types.GenerateContentResponseUsageMetadata(
+            prompt_token_count=12,
+            candidates_token_count=8,
+        ),
+        text="回答",
+    )
+    generate_content, _ = _patch_client(monkeypatch, response)
+    timestamps = iter([10.0, 12.5])
+    monkeypatch.setattr(ask_module.time, "perf_counter", lambda: next(timestamps))
+
+    result = ask_module.ask_with_metrics(
+        "質問",
+        model="test-model",
+    )
+
+    assert result.answer == "回答"
+    assert result.elapsed_seconds == 2.5
+    assert result.input_tokens == 12
+    assert result.output_tokens == 8
+    assert result.usage_metadata is not None
+    generate_content.assert_called_once_with(model="test-model", contents="質問")
+
+
+def test_ask_with_metrics_records_api_error_duration(monkeypatch):
+    """生成APIエラーでも経過時間とHTTP statusを保持する。"""
+    generate_content, _ = _patch_client(monkeypatch, None)
+    generate_content.side_effect = errors.APIError(
+        429, {"error": {"message": "rate limited"}}
+    )
+    timestamps = iter([10.0, 11.25])
+    monkeypatch.setattr(ask_module.time, "perf_counter", lambda: next(timestamps))
+
+    result = ask_module.ask_with_metrics("質問", model="test-model")
+
+    assert result.elapsed_seconds == 1.25
+    assert result.api_error is not None
+    assert result.api_error.code == 429
+    assert result.api_error is generate_content.side_effect
+    assert result.input_tokens is None
+    assert result.output_tokens is None
 
 
 def test_ask_passes_temperature_in_generate_content_config(monkeypatch):
