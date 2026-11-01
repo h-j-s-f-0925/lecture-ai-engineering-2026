@@ -11,6 +11,8 @@
 """
 
 import argparse
+import time
+from dataclasses import dataclass
 
 from google import genai
 from google.genai import errors
@@ -23,97 +25,133 @@ from app.config import MODEL, api_error_message, get_api_key
 DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
 
 
+@dataclass(frozen=True)
+class AskResult:
+    """生成APIの回答、利用量、応答時間をまとめた結果。"""
+
+    answer: str
+    input_tokens: int | None
+    output_tokens: int | None
+    history_tokens: int | None
+    elapsed_seconds: float
+    usage_metadata: dict[str, object] | None
+    api_error: errors.APIError | None = None
+
+
+def ask_with_metrics(
+    question: str,
+    temperature: float | None = None,
+    history: list[types.Content] | None = None,
+    model: str = MODEL,
+    client: genai.Client | None = None,
+) -> AskResult:
+    """質問を送り、回答とAPI利用量・API応答時間を返す。"""
+    # client が呼び出し元から渡された場合
+    if client is None:
+        # Gemini APIキーを使ってSDKクライアントを作る。
+        client = genai.Client(api_key=get_api_key())
+
+    history_tokens: int | None = 0
+    # 過去の会話がある場合
+    if history:
+        # Gemini APIのCount tokens APIにモデル名と過去発話を渡し、
+        # CountTokensResponse.total_tokensで履歴だけのtoken数を得る。
+        history_usage = client.models.count_tokens(model=model, contents=list(history))
+        history_tokens = history_usage.total_tokens
+        contents: str | list[types.Content] = [
+            *history,
+            types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=question)],
+            ),
+        ]
+    # 過去の会話がない場合
+    else:
+        contents = question
+
+    # temperatureを指定した場合
+    if temperature is not None:
+        config = types.GenerateContentConfig(temperature=temperature)
+    # temperatureを省略した場合
+    else:
+        config = None
+
+    # 単調時計は時刻修正の影響を受けず、処理にかかった時間を測る。
+    started_at = time.perf_counter()
+    try:
+        # 生成設定がない場合
+        if config is None:
+            # Gemini APIのGenerateContent APIへモデル名と入力を渡し、生成Responseを受け取る。
+            response = client.models.generate_content(model=model, contents=contents)
+        # 生成設定がある場合
+        else:
+            # configにもtemperatureを含めて渡し、生成Responseを受け取る。
+            response = client.models.generate_content(
+                model=model, contents=contents, config=config
+            )
+    # GenerateContent APIがHTTP/APIエラーを返した場合
+    except errors.APIError as error:
+        elapsed_seconds = time.perf_counter() - started_at
+        return AskResult(
+            answer="",
+            input_tokens=None,
+            output_tokens=None,
+            history_tokens=history_tokens,
+            elapsed_seconds=elapsed_seconds,
+            usage_metadata=None,
+            api_error=error,
+        )
+    elapsed_seconds = time.perf_counter() - started_at
+
+    usage = response.usage_metadata
+    # API responseにtoken利用量が含まれる場合
+    if usage is not None:
+        input_tokens = usage.prompt_token_count
+        output_tokens = usage.candidates_token_count
+        # SDKのmodel_dumpでusage metadataをJSONにできる辞書へ変換して保存する。
+        usage_metadata = usage.model_dump(mode="json", exclude_none=True)
+    # API responseにtoken利用量が含まれない場合
+    else:
+        input_tokens = None
+        output_tokens = None
+        usage_metadata = None
+
+    return AskResult(
+        answer=response.text,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        history_tokens=history_tokens,
+        elapsed_seconds=elapsed_seconds,
+        usage_metadata=usage_metadata,
+    )
+
+
+def _print_token_usage(result: AskResult) -> None:
+    """既存CLIと同じ書式で履歴・入力・出力トークン数を表示する。"""
+    history_display = (
+        result.history_tokens if result.history_tokens is not None else "不明"
+    )
+    input_display = result.input_tokens if result.input_tokens is not None else "不明"
+    output_display = (
+        result.output_tokens if result.output_tokens is not None else "不明"
+    )
+    print(
+        f"[トークン] 履歴: {history_display} / "
+        f"入力全体: {input_display} / 出力: {output_display}"
+    )
+
+
 def ask(
     question: str,
     temperature: float | None = None,
     history: list[types.Content] | None = None,
 ) -> str:
     """質問をモデルへ送り、回答文を返す。必要に応じて会話履歴も渡す。"""
-    # APIキーを渡してSDKクライアントを作り、Gemini APIへの窓口として使う。
-    client = genai.Client(api_key=get_api_key())
-    # 履歴がない最初の質問では、履歴トークン数は0とする。
-    history_tokens: int | None = 0
-    # 会話履歴がある場合
-    if history:
-        # len(history)で分かるのは発話数で、モデルが処理するトークン数ではない。
-        # 履歴だけのトークン数を得るため、Gemini APIのCount tokens APIを追加で呼び出す。
-        # Python SDKではclient.models.count_tokens(...)にモデル名と履歴を渡し、
-        # 返されたCountTokensResponseのtotal_tokensから履歴のトークン数を取り出す。
-        history_usage = client.models.count_tokens(
-            model=MODEL, contents=list(history)
-        )
-        history_tokens = history_usage.total_tokens
-        # 過去の発話を保ち、今回の質問を末尾に追加してターン順を維持する。
-        contents: str | list[types.Content] = [
-            *history,
-            types.Content(
-                role="user",
-                # 質問文をSDKのテキストPartに変換し、Contentの本文として格納する。
-                parts=[types.Part.from_text(text=question)],
-            ),
-        ]
-    # 会話履歴がない場合
-    else:
-        # 単発質問では従来のリクエスト形式を保つ。
-        contents = question
-    # temperature が指定された場合
-    if temperature is not None:
-        # 指定値をSDKの生成設定へ変換する。
-        config = types.GenerateContentConfig(temperature=temperature)
-    # temperature が省略された場合
-    else:
-        # 後続処理で設定引数を省略できるようNoneにする。
-        config = None
-    # 生成設定がない場合
-    if config is None:
-        # modelにモデル名、contentsに質問を渡すと、生成結果を含むResponseが返る。
-        response = client.models.generate_content(model=MODEL, contents=contents)
-    # 生成設定がある場合
-    else:
-        # configも渡すことでtemperatureを適用し、Responseから本文や利用量を読む。
-        response = client.models.generate_content(
-            model=MODEL, contents=contents, config=config
-        )
-
-    # SDKの利用量メタデータではpromptが入力、candidatesが生成出力のトークン数を表す。
-    usage = response.usage_metadata
-    # 利用量メタデータがある場合
-    if usage is not None:
-        # SDKの項目名から入力・出力のトークン数を取り出す。
-        input_tokens = usage.prompt_token_count
-        output_tokens = usage.candidates_token_count
-    # 利用量メタデータがない場合
-    else:
-        # 未取得と0トークンを区別できるようNoneで表す。
-        input_tokens = None
-        output_tokens = None
-
-    # 入力トークン数が取得できた場合
-    if input_tokens is not None:
-        input_display = input_tokens
-    # 入力トークン数を取得できない場合
-    else:
-        input_display = "不明"
-    # 出力トークン数が取得できた場合
-    if output_tokens is not None:
-        output_display = output_tokens
-    # 出力トークン数を取得できない場合
-    else:
-        output_display = "不明"
-    # 履歴トークン数を計数できた場合
-    if history_tokens is not None:
-        history_display = history_tokens
-    # 履歴トークン数を計数できない場合
-    else:
-        history_display = "不明"
-
-    # 入力は履歴と今回の質問の合計、履歴は過去の会話だけの数を示す。
-    print(
-        f"[トークン] 履歴: {history_display} / "
-        f"入力全体: {input_display} / 出力: {output_display}"
-    )
-
-    return response.text
+    result = ask_with_metrics(question, temperature=temperature, history=history)
+    _print_token_usage(result)
+    if result.api_error is not None:
+        raise result.api_error
+    return result.answer
 
 
 def run_interactive(temperature: float | None = None) -> None:
