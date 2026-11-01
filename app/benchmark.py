@@ -281,8 +281,8 @@ def _format_seconds(seconds: float) -> str:
 def render_summary(records: list[RunRecord]) -> str:
     """モデル・質問ごとの成功数、失敗数、時間とtoken数を集計する。"""
     lines = [
-        "| モデル | 質問 | 成功 / 失敗 | 応答時間 平均 / 中央値 / 最小 / 最大（秒） | 平均入力token | 平均出力token |",
-        "|---|---|---:|---:|---:|---:|",
+        "| モデル | 質問 | 成功数 | 失敗数 | 平均応答時間（秒） | 中央値（秒） | 最小（秒） | 最大（秒） | 平均入力token | 平均出力token |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     groups = dict.fromkeys((record.model, record.question) for record in records)
     for model, question in groups:
@@ -296,18 +296,15 @@ def render_summary(records: list[RunRecord]) -> str:
         durations = [record.elapsed_seconds for record in successful]
         # 成功した応答時間が1件以上ある場合
         if durations:
-            duration_summary = " / ".join(
-                _format_seconds(value)
-                for value in (
-                    statistics.mean(durations),
-                    statistics.median(durations),
-                    min(durations),
-                    max(durations),
-                )
-            )
+            mean_duration = _format_seconds(statistics.mean(durations))
+            median_duration = _format_seconds(statistics.median(durations))
+            minimum_duration = _format_seconds(min(durations))
+            maximum_duration = _format_seconds(max(durations))
         # 成功した応答時間がない場合
         else:
-            duration_summary = "不明"
+            mean_duration = median_duration = minimum_duration = maximum_duration = (
+                "不明"
+            )
 
         input_values = [
             record.input_tokens
@@ -320,20 +317,29 @@ def render_summary(records: list[RunRecord]) -> str:
             if record.output_tokens is not None
         ]
         input_average = (
-            f"{statistics.mean(input_values):.1f}（{len(input_values)}回分）"
+            f"{statistics.mean(input_values):.1f}"
             if input_values
             else "不明"
         )
         output_average = (
-            f"{statistics.mean(output_values):.1f}（{len(output_values)}回分）"
+            f"{statistics.mean(output_values):.1f}"
             if output_values
             else "不明"
         )
         lines.append(
             f"| {_escape_cell(model)} | {_escape_cell(question)} "
-            f"| {len(successful)} / {failed_count} | {duration_summary} "
+            f"| {len(successful)} | {failed_count} "
+            f"| {mean_duration} | {median_duration} "
+            f"| {minimum_duration} | {maximum_duration} "
             f"| {input_average} | {output_average} |"
         )
+    lines.extend(
+        [
+            "",
+            "注: 応答時間とtoken数の平均は成功した応答のみを対象にしています。"
+            "token数はusage metadataが取得できた応答から計算します。",
+        ]
+    )
     return "\n".join(lines)
 
 

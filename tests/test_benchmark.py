@@ -174,9 +174,11 @@ def test_summary_excludes_failed_request_duration():
     summary = benchmark.render_summary(records)
     details = benchmark.render_run_results(records)
 
-    assert "1 / 1" in summary
-    assert "1.000 / 1.000 / 1.000 / 1.000" in summary
+    assert "| 成功数 | 失敗数 |" in summary
+    assert "| 1 | 1 | 1.000 | 1.000 | 1.000 | 1.000 |" in summary
     assert r"質問\|A" in summary
+    assert "回分" not in summary
+    assert "成功した応答のみ" in summary
     assert "| 429 |" in details
     assert "100.000" in details
 
