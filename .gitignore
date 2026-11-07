@@ -7,8 +7,9 @@ __pycache__/
 .env
 .env.*
 
-# 個人の学習ログ（第3回の宿題で作成）は共有しない
-learning_log/
+# GitHubに上げない個人用の記録・作業メモ
+learning/personal_logs/
+docs/
 
 # macOS
 .DS_Store
