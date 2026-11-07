@@ -6,10 +6,13 @@
 
 import json
 import random
+import re
+from datetime import datetime
 from functools import cache
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+LEARNING_LOG_DIR = Path(__file__).resolve().parent.parent / "learning_log"
 MAX_RESULTS = 3
 
 
@@ -100,3 +103,39 @@ def make_quiz(lecture: int) -> str:
         "answer": term["definition"],
     }
     return json.dumps(quiz, ensure_ascii=False)
+
+
+def _learning_log_slug(title: str) -> str:
+    """内容を表すタイトルをファイル名に使える形式へ整える。"""
+    # タイトルがMarkdown見出しでも、ファイル名には見出し記号を含めない
+    title = re.sub(r"^#{1,6}\s*", "", title.strip())
+    # 日本語などの文字・数字・ハイフン以外の連続を、区切りのハイフンに置き換える
+    slug = re.sub(r"[^\w-]+", "-", title, flags=re.UNICODE)
+    # ハイフンの連続と両端の記号を整え、ファイル名が長くなりすぎないよう40文字に制限する
+    slug = re.sub(r"-+", "-", slug).strip("-_")[:40].rstrip("-_")
+    # タイトルが空、または記号だけだった場合に使う既定名
+    return slug or "学習記録"
+
+
+def save_learning_log(content: str, title: str) -> str:
+    """学習の振り返りを learning_log/ にMarkdownファイルとして保存する。
+
+    title には本文全体の内容を表す短い名前を指定する。日時とtitleからファイル名を
+    作り、contentを保存する。同名ファイルがある場合は上書きせずエラーにする。
+    保存前の確認はアプリ側で行う設定で使う。
+    """
+    LEARNING_LOG_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    filename = f"{timestamp}_{_learning_log_slug(title)}.md"
+    path = LEARNING_LOG_DIR / filename
+
+    try:
+        with path.open("x", encoding="utf-8") as file:
+            file.write(content)
+            # 本文が改行で終わっていない場合
+            if not content.endswith("\n"):
+                file.write("\n")
+    except FileExistsError as error:
+        raise FileExistsError(f"学習記録を上書きしないため保存を中止しました: {path}") from error
+
+    return f"学習記録を {path.as_posix()} に保存しました。"
