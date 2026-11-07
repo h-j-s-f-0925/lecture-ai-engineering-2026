@@ -8,7 +8,7 @@ __pycache__/
 .env.*
 
 # GitHubに上げない個人用の記録・作業メモ
-learning/personal_logs/
+learning_log/
 docs/
 
 # macOS
