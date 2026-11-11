@@ -23,12 +23,21 @@ def api_error_message(status: int, detail: str = "") -> str:
 
 
 def get_api_key() -> str:
-    """環境変数 GEMINI_API_KEY を返す。未設定なら手順を表示して終了する。"""
-    key = os.getenv("GEMINI_API_KEY")
+    """AIE_API_TIER で選択した Gemini API キーを返す。既定は無料用。"""
+    tier = os.getenv("AIE_API_TIER", "free")
+    key_names = {
+        "free": "GEMINI_API_KEY",
+        "paid": "GEMINI_API_KEY_PAID",
+    }
+    if tier not in key_names:
+        raise SystemExit("環境変数 AIE_API_TIER は free または paid を指定してください。")
+
+    key_name = key_names[tier]
+    key = os.getenv(key_name)
     if not key:
         raise SystemExit(
-            "環境変数 GEMINI_API_KEY が見つかりません。\n"
-            "1. GitHub の Settings → Codespaces → Secrets に GEMINI_API_KEY を登録し、\n"
+            f"環境変数 {key_name} が見つかりません。\n"
+            f"GitHub の Settings → Codespaces → Secrets に {key_name} を登録し、\n"
             "   使う repository に自分の fork を選んでください。\n"
             "2. Codespaces を起動したあとに登録した場合は、Codespaces を再起動してください。\n"
             "   （左下の「Codespaces」→「Stop Current Codespace」→ 再度開く）"
