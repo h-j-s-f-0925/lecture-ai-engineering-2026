@@ -1,0 +1,408 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "rubric": "data/eval/rubric.md",
+  "run_at": "2026-11-16T13:06:17",
+  "verdicts": {
+    "01": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集のエントリと完全に一致しており、矛盾や推測による断定はありません。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "AIエンジニアリング講座の用語に関する質問に適切に答えています。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の解答ではなく用語の説明であるため、この基準は自動的にpassとなります。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "質問に直接簡潔に答えており、末尾の回を除いた本文の文字数も300文字以内です。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "02": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集のエントリにあるエージェントループの定義や注意点に忠実に沿って説明されており、矛盾がないため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "AIエンジニアリング講座の用語について適切な範囲で回答しているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "用語の定義に関する質問であり、宿題の答えそのものを聞く内容ではないため。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "回答の本文は287文字（300文字以内）であり、質問に直接答えて簡潔にまとまっているため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "03": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集のエントリに沿って「モデル・ループ・ツール」の役割と関係性が正確に説明されているため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "AIエンジニアリング講座の第3回で扱う用語について適切に解説しているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えをそのまま書くような質問ではないため、この基準は自動的にpassとなる。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "質問に直接答えて簡潔に説明されており、末尾を除いた本文も300文字以内であるため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "04": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集にはないが、期待するふるまいに沿って第4回の内容を過不足なくまとめているため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "講座の第4回の内容に関する質問に適切に応じているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えを直接求めている質問ではなく、要点のまとめであるため自動的にpassとなる。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "質問に直接答えて簡潔にまとまっており、本文の文字数も300文字以内であるため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "05": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集のエントリに沿って説明しており、矛盾や不要な断定がないため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "AIエンジニアリング講座の用語について答えており、範囲内に収まっているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えを直接求めている質問ではないため、この基準は自動的にpassとなる。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "末尾の「関係する回」を除いた本文は300文字以内であり、質問に直接答えて簡潔に書かれているため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "fail"
+      }
+    },
+    "06": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集の定義に沿って、正常系だけでなく壊れやすい入力（エッジケース）を含めるべきだと正確に説明しているため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "AIエンジニアリング講座の第4回の内容（評価セット）に関する質問に対して、適切に講座の範囲内で答えているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えそのものではなく、評価セットに必要な考え方のヒントを説明しているため。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "回答本文は250文字程度で300文字以内であり、質問に直接答えて簡潔にまとまっているため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "07": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "第2回の具体的な数値は記載されていないと述べ、値を推測・断定せずにノートブックを確認するよう案内しているため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "講座の範囲である第2回の内容や演習に関する質問に適切に応じているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えそのものではなく、確認方法の案内にとどめているため。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "回答本文の文字数が300文字以内であり、質問に直接答えて簡潔にまとまっているため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "08": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "エージェントループは用語集に沿って正確に説明されており、最新モデル名についても用語集や提供情報に記載がないことを伝えて推測していないため。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "講座の用語や提供情報に基づいて適切に回答しており、範囲外の質問に対しても適切に処理しているため。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えに関する質問ではないため、この基準は自動的にpassとなる。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "質問に直接答えており、末尾の関連する回を除いた本文が300文字以内で簡潔に書かれているため。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "09": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "用語集のエントリの定義や性質に基づいて正確に説明されており、用語集にない不適切な推測も含まれていません。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "AIエンジニアリング講座の用語に関する質問に対して適切に範囲内で回答しています。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "宿題の答えを直接求めている質問ではなく、用語の違いを問う内容であるためこの基準は合格となります。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "質問に対して表形式で簡潔にまとめられており、回答本文も300文字以内におさまるため適切です。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    },
+    "10": {
+      "grounding": {
+        "verdict": "pass",
+        "reason": "参照の用語集にある「ADK」のエントリの内容と正確に一致しており、矛盾はありません。"
+      },
+      "scope": {
+        "verdict": "pass",
+        "reason": "第3回の用語から確認問題を出力しており、講座の学習範囲内で適切に対応しています。"
+      },
+      "hint": {
+        "verdict": "pass",
+        "reason": "確認問題の答えを含めることがユーザーの明示的な要求であるため、この基準では問題なくパスします。"
+      },
+      "clarity": {
+        "verdict": "pass",
+        "reason": "質問に直接答えており、末尾の「関係する回」を除いた本文の文字数も300文字以内におさまっています。"
+      },
+      "lecture_mark": {
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定",
+        "verdict": "pass"
+      }
+    }
+  },
+  "summary": {
+    "n": 10,
+    "per_criterion": {
+      "grounding": {
+        "name": "根拠",
+        "agree": 9,
+        "compared": 10,
+        "total": 10
+      },
+      "scope": {
+        "name": "範囲",
+        "agree": 9,
+        "compared": 10,
+        "total": 10
+      },
+      "hint": {
+        "name": "ヒント",
+        "agree": 9,
+        "compared": 10,
+        "total": 10
+      },
+      "clarity": {
+        "name": "分かりやすさ",
+        "agree": 3,
+        "compared": 10,
+        "total": 10
+      },
+      "lecture_mark": {
+        "name": "回の表示",
+        "agree": 5,
+        "compared": 10,
+        "total": 10
+      }
+    },
+    "overall": {
+      "agree": 5,
+      "compared": 10
+    },
+    "coverage": {
+      "covered": 10,
+      "total": 10
+    },
+    "review": [],
+    "mismatches": [
+      {
+        "id": "02",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "回答の本文は287文字（300文字以内）であり、質問に直接答えて簡潔にまとまっているため。"
+      },
+      {
+        "id": "02",
+        "criterion": "lecture_mark",
+        "name": "回の表示",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定"
+      },
+      {
+        "id": "03",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "質問に直接答えて簡潔に説明されており、末尾を除いた本文も300文字以内であるため。"
+      },
+      {
+        "id": "04",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "質問に直接答えて簡潔にまとまっており、本文の文字数も300文字以内であるため。"
+      },
+      {
+        "id": "04",
+        "criterion": "lecture_mark",
+        "name": "回の表示",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定"
+      },
+      {
+        "id": "05",
+        "criterion": "scope",
+        "name": "範囲",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "AIエンジニアリング講座の用語について答えており、範囲内に収まっているため。"
+      },
+      {
+        "id": "05",
+        "criterion": "hint",
+        "name": "ヒント",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "宿題の答えを直接求めている質問ではないため、この基準は自動的にpassとなる。"
+      },
+      {
+        "id": "05",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "末尾の「関係する回」を除いた本文は300文字以内であり、質問に直接答えて簡潔に書かれているため。"
+      },
+      {
+        "id": "06",
+        "criterion": "lecture_mark",
+        "name": "回の表示",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定"
+      },
+      {
+        "id": "07",
+        "criterion": "grounding",
+        "name": "根拠",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "第2回の具体的な数値は記載されていないと述べ、値を推測・断定せずにノートブックを確認するよう案内しているため。"
+      },
+      {
+        "id": "07",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "回答本文の文字数が300文字以内であり、質問に直接答えて簡潔にまとまっているため。"
+      },
+      {
+        "id": "07",
+        "criterion": "lecture_mark",
+        "name": "回の表示",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定"
+      },
+      {
+        "id": "08",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "質問に直接答えており、末尾の関連する回を除いた本文が300文字以内で簡潔に書かれているため。"
+      },
+      {
+        "id": "09",
+        "criterion": "clarity",
+        "name": "分かりやすさ",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "質問に対して表形式で簡潔にまとめられており、回答本文も300文字以内におさまるため適切です。"
+      },
+      {
+        "id": "09",
+        "criterion": "lecture_mark",
+        "name": "回の表示",
+        "kind": "見逃し",
+        "judge": "pass",
+        "human": "fail",
+        "reason": "末尾（最後の行）に「第N回」があるかをコードで判定"
+      }
+    ]
+  }
+}
