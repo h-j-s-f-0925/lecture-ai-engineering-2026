@@ -1,0 +1,7 @@
+# Windowsホストにソースコードを配置し、Linuxコンテナで開発する場合の対策
+# Windows（CRLF）とLinux（LF）の改行コードの違いによる意図しないGit差分を防止するため、テキストファイルの改行コードをLFに統一する
+* text=auto eol=lf
+
+# Windowsで実行するバッチファイルは例外としてCRLFを使用する
+*.[cC][mM][dD] text eol=crlf
+*.[bB][aA][tT] text eol=crlf

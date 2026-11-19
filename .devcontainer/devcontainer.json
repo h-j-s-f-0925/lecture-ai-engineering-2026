@@ -7,7 +7,9 @@
   },
   "containerEnv": {
     "PYDANTIC_AI_NO_BANNER": "1",
-    "UV_LINK_MODE": "copy"
+    "UV_LINK_MODE": "copy",
+    // 仮想環境はホストと共有しないコンテナ内に置く（Windows ホストでも速く、ホストの .venv と混ざらない）
+    "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv"
   },
   // Codespaces 作成時に登録を促すシークレット
   "secrets": {
@@ -16,12 +18,21 @@
       "documentationUrl": "https://aistudio.google.com/apikey"
     }
   },
-  "postCreateCommand": "pipx install uv && uv sync --frozen",
+  // Windows からのバインドマウントでは所有者が一致せず Git が dubious ownership で止まるため、
+  // ワークスペースを safe.directory に登録する（--system にしてホスト由来の ~/.gitconfig と混ぜない）
+  "postCreateCommand": "sudo git config --system --add safe.directory '${containerWorkspaceFolder}' && pipx install uv && uv sync --frozen",
+  // Windows の ~/.gitconfig がコンテナにコピーされ、C:/ で始まる safe.directory が「not absolute」の警告を出す
+  // コンテナ起動のたびに、コピーされた ~/.gitconfig から C:/ などで始まる safe.directory だけを削除する
+  // 該当がないときの終了コード 5 はエラー扱いしない
+  "postStartCommand": "git config --global --unset-all safe.directory '^[A-Za-z]:/' || [ $? -eq 5 ]",
   "customizations": {
     "vscode": {
       "extensions": ["ms-python.python", "GitHub.copilot-chat"],
       "settings": {
-        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python"
+        // VS Code の Python 拡張機能が最初に使う Python（補完・実行・デバッグ用。手動で選び直すとそちらが優先）
+        // 変更前の ${containerWorkspaceFolder}/.venv は Windows と共有されるフォルダ内にあり、uv sync や import が遅い
+        // UV_PROJECT_ENVIRONMENT で .venv を共有されない /home/vscode/.venv に移したため、値を /home/vscode/.venv/bin/python に変更した
+        "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python"
       }
     }
   }
