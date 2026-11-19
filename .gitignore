@@ -6,6 +6,8 @@ __pycache__/
 # 秘密情報はコミットしない（APIキーは Codespaces secret で渡す）
 .env
 .env.*
+# 環境変数の設定サンプルはGit管理対象とする
+!.env.sample
 
 # GitHubに上げない個人用の記録・作業メモ
 learning_log/
