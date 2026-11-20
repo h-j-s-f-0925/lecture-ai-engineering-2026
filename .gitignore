@@ -18,3 +18,6 @@ docs/
 
 # 第5回: 資料から再生成する検索DB
 .cache/rag/
+
+# 講義回ごとの実行ログ（lectures/NN/.log/）
+lectures/*/.log/
