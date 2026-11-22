@@ -24,7 +24,7 @@
 #
 # 出力先（<回> は質問ファイルがあるフォルダ。同じ日の2回目以降は _2, _3 … を付ける）:
 #   <回>/results/<YYYYMMDD>_<名前>/summary.md   実行条件と [model]・[time]・[usage]・[cost]・[tool call] の抜き出し
-#   <回>/results/<YYYYMMDD>_<名前>/結果.md      全実行のコマンドと出力全文
+#   <回>/results/<YYYYMMDD>_<名前>/<YYYYMMDD>_<N>_結果.md  全実行のコマンドと出力全文（N はその日の何回目の実行か。1から数える）
 #   <回>/.log/<YYYYMMDD>_<名前>/<質問ID>_<方式>.log  各実行の標準出力・標準エラー（.gitignore の対象）
 
 set -u
@@ -144,18 +144,20 @@ fi
 
 # 出力フォルダ名は「日付_名前」。同じ日に再実行したときは _2, _3 … を付けて上書きを防ぐ
 RUN_STARTED="$(date '+%Y-%m-%d %H:%M:%S')"
-BASE_NAME="$(date +%Y%m%d)_${RUN_NAME}"
+RUN_DATE="$(date +%Y%m%d)"
+BASE_NAME="${RUN_DATE}_${RUN_NAME}"
 DIR_NAME="$BASE_NAME"
-n=2
+# その日の何回目の実行か（フォルダ名の _2, _3 … と同じ番号。1回目は 1）
+RUN_NO=1
 while [[ -e "${LECTURE_DIR}/results/${DIR_NAME}" || -e "${LECTURE_DIR}/.log/${DIR_NAME}" ]]; do
-  DIR_NAME="${BASE_NAME}_${n}"
-  n=$((n + 1))
+  RUN_NO=$((RUN_NO + 1))
+  DIR_NAME="${BASE_NAME}_${RUN_NO}"
 done
 OUT_DIR="${LECTURE_DIR}/results/${DIR_NAME}"
 LOG_DIR="${LECTURE_DIR}/.log/${DIR_NAME}"
 mkdir -p "$OUT_DIR" "$LOG_DIR"
 SUMMARY="${OUT_DIR}/summary.md"
-FULL="${OUT_DIR}/結果.md"
+FULL="${OUT_DIR}/${RUN_DATE}_${RUN_NO}_結果.md"
 
 # 表示用に、リポジトリのルートからの相対パスにする
 rel() { echo "${1#"${REPO_ROOT}/"}"; }
