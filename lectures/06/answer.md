@@ -63,7 +63,57 @@
 
 ---
 
-- 取り組んだレベル：実装 / 発展
+- 取り組んだレベル：実装
+- やったこと：
+  - `app/mcp_server.py` に `server.tool()(tools.make_quiz)` を追加し、第3回で作った `make_quiz` を MCP ツールとして公開した。
+  - `--list-tools` で、エージェント側を変えずに一覧が9個に増え、`glossary_make_quiz` が表示されることを確認した。説明文は `app/tools.py` の docstring のままで、引数は `{"lecture": {"title": "Lecture", "type": "integer"}}` だった。
+  - 用語集の回ごとの用語数を数えると、第1回 26件、第2回 12件、第3回 13件、第4回 7件、第6回 7件で、第5回は0件だった。そこで、存在しない回（第99回）と、講義はあるが用語がない回（第5回）の2つで試した。
+  - 範囲外のときの返し方を、`return`（既存の「第○回の用語が見つかりません。」）と `raise ValueError(...)`（同じ文）で比べた。文の中身をそろえ、違いが返し方だけになるようにした。
+
+    ```bash
+    # 範囲外の回を質問し、ツールの呼び出しと戻り値を表示する
+    AIE_API_TIER=paid uv run --env-file .env python -m app.mcp_agent --trace "第99回のクイズを作って"
+    AIE_API_TIER=paid uv run --env-file .env python -m app.mcp_agent --trace "第5回のクイズを作って"
+    ```
+
+- 結果：
+  - `return` のとき、第99回は次のとおりで、返した文がそのままモデルに渡った。
+
+    ```text
+    [tool call]   glossary_make_quiz({'lecture': 99})
+    [tool return] glossary_make_quiz -> 第99回の用語が見つかりません。…
+    [usage] 入力 5,602 tokens / 出力 50 tokens / モデル応答 2 回
+    ```
+
+    最終回答は「第99回は存在しないか、用語集に登録されていません」だった。
+  - `return` のとき、第5回は `[tool return] glossary_make_quiz -> 第5回の用語が見つかりません。…`、モデル応答2回だった。最終回答は「他の回（例: 第1回〜第4回など）の確認問題をご希望でしたら…」で、用語がある第6回が抜けていた。
+  - `raise` のとき、第99回は次のとおりで、用意した文はモデルに渡らず、決まった文に置き換わった。
+
+    ```text
+    [tool call]   glossary_make_quiz({'lecture': 99})
+    [tool error]  glossary_make_quiz -> Error executing tool make_quiz
+    [usage] 入力 5,604 tokens / 出力 84 tokens / モデル応答 2 回
+    ```
+
+    画面にはサーバー側のトレースバック（エラーが起きたときに、どの関数がどの順で呼ばれ、どのファイルの何行目で止まったかを表示する記録）が表示され、最後は `UnexpectedToolError: Error executing tool make_quiz` だった。最終回答は「第1回〜第N回などを指定していただければ…」と、`return` のときよりあいまいになった。
+  - どちらの返し方でも、モデルは呼び直さず、`[tool call]` 1回、モデル応答2回で答えた。
+
+  | | `return` | `raise ValueError` |
+  |---|---|---|
+  | トレースの行 | `[tool return]` | `[tool error]` |
+  | モデルに渡った文 | 書いた文そのまま | `Error executing tool make_quiz` だけ |
+  | 呼び直し | なし | なし |
+  | 最終回答 | 第99回が見つからない理由を案内した | 「第1回〜第N回」とあいまいに案内した |
+
+- 気づき・疑問：
+  - トレースバックの `mcp/server/mcpserver/tools/base.py:211-213` で、MCP サーバーはツールの中の普通の例外を `UnexpectedToolError`（予期しないクラッシュ）に変えていた。元の例外の文はサーバー側のログにだけ残り、モデルには渡らない。利用者やモデルに理由を伝えたい範囲外の引数は、`return` で返す方が合っていると分かった。
+  - `return` でも、ツールの文に書かれていないことは、モデルが推測で補っていた。第5回の回答の「第1回〜第4回など」は、作れる回の一覧が文に無かったためだと考えられる。作れる回の一覧を文に入れると回答が正しくなるかは、まだ試していない。
+  - 同じ「見つかりません」でも、第99回は講義が無い回、第5回は講義はあるが用語が無い回で、意味が違う。今の文では、この違いがモデルに伝わらない。
+  - トレースバックの `base.py:210` に `raise ToolError(...)` という別の行があった。SDK の `ToolError` で `raise` すると、文がモデルに渡るのかを確かめたい。
+
+---
+
+- 取り組んだレベル：発展
 - やったこと：
 - 結果：
 - 気づき・疑問：
