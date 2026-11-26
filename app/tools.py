@@ -96,6 +96,10 @@ def make_quiz(lecture: int) -> str:
 
     # 指定した回の用語が見つからない場合
     if not terms:
+        # raise ValueError ではなく return で返す。
+        # return：書いた文が [tool return] としてそのままモデルに渡り、モデルは理由を読んで案内できる。
+        # raise ValueError：MCP サーバーが予期しないクラッシュ（UnexpectedToolError）として扱い、
+        #   モデルには "Error executing tool make_quiz" だけが渡る。書いた文はサーバーのログにしか残らない。
         return f"第{lecture}回の用語が見つかりません。"
 
     # 用語が見つかった場合
