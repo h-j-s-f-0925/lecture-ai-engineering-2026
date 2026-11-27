@@ -1,0 +1,81 @@
+{
+  "config": {
+    "base_model": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "seed": 42,
+    "num_train_epochs": 20,
+    "warmup_steps": 6,
+    "lr": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "max_seq_len": 512,
+    "max_new_tokens": 96,
+    "gen": {
+      "do_sample": false
+    }
+  },
+  "versions": {
+    "transformers": "5.18.0",
+    "peft": "0.21.1",
+    "trl": "1.14.2",
+    "torch": "2.14.1+cu130"
+  },
+  "method": "LoRA（量子化なし）",
+  "training": {
+    "final_loss": 0.01732919067144394,
+    "training_seconds": 244.7,
+    "steps": 40
+  },
+  "before": {
+    "label": "before",
+    "n": 21,
+    "format_rate": 0.0,
+    "content_rate": 0.0,
+    "both_rate": 0.0,
+    "seconds": 55.2
+  },
+  "after": {
+    "label": "after",
+    "n": 21,
+    "format_rate": 1.0,
+    "content_rate": 0.7142857142857143,
+    "both_rate": 0.7142857142857143,
+    "seconds": 40.8
+  },
+  "regressed": [],
+  "knowledge": [
+    {
+      "質問": "app.judge は何をするコマンドですか",
+      "FAQ にある": false,
+      "学習前の分類": "format_error",
+      "学習前の出力": "{\n  \"answer\": \"app.judge は app.agent に --trace を付けて実行すると確認できます。\"\n}",
+      "学習後の分類": "needs_review",
+      "学習後の出力": "{\"answer\": \"この FAQ には記載がありません。運営に確認が必要です。\", \"needs_review\": true}"
+    },
+    {
+      "質問": "この講座の第 7 回のテーマは何ですか",
+      "FAQ にある": false,
+      "学習前の分類": "asserted",
+      "学習前の出力": "{\n  \"answer\": \"この講座の第 7 回のテーマは「LLM の生成モデルの学習と評価」です。\",\n  \"needs_review\": false\n}",
+      "学習後の分類": "asserted",
+      "学習後の出力": "{\"answer\": \"この講座の開始時点のコードは lecNN-start タグから作業ブランチを作って使います。\", \"needs_review\": false}"
+    },
+    {
+      "質問": "評価セットは何件で作りますか",
+      "FAQ にある": false,
+      "学習前の分類": "format_error",
+      "学習前の出力": "{\"answer\": \"FAQに記載がありません。\"}",
+      "学習後の分類": "needs_review",
+      "学習後の出力": "{\"answer\": \"この FAQ には記載がありません。運営に確認が必要です。\", \"needs_review\": true}"
+    },
+    {
+      "質問": "モデルを指定する環境変数は？",
+      "FAQ にある": true,
+      "学習前の分類": "format_error",
+      "学習前の出力": "{\n  \"answer\": \"AIE_MODEL\"\n}",
+      "学習後の分類": "asserted",
+      "学習後の出力": "{\"answer\": \"使うモデルは AIE_MODEL という環境変数で切り替えます。\", \"needs_review\": false}"
+    }
+  ],
+  "executed_training_myself": true
+}
