@@ -259,5 +259,5 @@ KNOWLEDGE_QUESTIONS = [
 1. 自分用にコピーしたノートブックを開き、ランタイムのタイプを T4 GPU にする。
 2. 貼り付け 1〜3 の 3 か所を置き換える。
 3. セクション 0 から上へ順に実行する。セクション 2 で `train=14 valid=7 test=21 gold=21` と出ることを確かめる。
-4. セクション 7 でできた `result.json` をダウンロードし、`lectures/02/result_command-faq.json` として置く。
+4. セクション 7 でできた `result.json` をダウンロードし、`lectures/02/implementation/result.json` として置く。
 5. ランタイムを接続解除して削除する。

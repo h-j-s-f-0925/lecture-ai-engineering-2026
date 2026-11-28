@@ -25,6 +25,7 @@ def main() -> None:
                     {"role": "assistant", "content": t["definition"]},
                 ]
             }
+            # sys.stdout.write :「標準出力」に書く
             sys.stdout.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 

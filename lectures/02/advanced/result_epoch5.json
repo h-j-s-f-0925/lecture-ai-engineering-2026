@@ -1,0 +1,65 @@
+{
+  "config": {
+    "base_model": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "seed": 42,
+    "num_train_epochs": 5,
+    "warmup_steps": 6,
+    "lr": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "max_seq_len": 512,
+    "max_new_tokens": 256,
+    "gen": {
+      "do_sample": false
+    }
+  },
+  "versions": {
+    "transformers": "5.18.0",
+    "peft": "0.21.1",
+    "trl": "1.14.2",
+    "torch": "2.14.1+cu130"
+  },
+  "method": "LoRA（量子化なし）",
+  "data": {
+    "train": 130,
+    "test": 22
+  },
+  "training": {
+    "seconds": 324,
+    "steps": 85,
+    "final_loss": 0.3141777992248535
+  },
+  "before": {
+    "label": "before",
+    "n": 22,
+    "同じ文": "0/8",
+    "言い換え（別名）": "0/4",
+    "言い換え（用語名なし）": "0/4",
+    "知らない語": "0/6",
+    "合計": "0/22",
+    "seconds": 269.0
+  },
+  "search": {
+    "label": "search",
+    "n": 22,
+    "同じ文": "5/8",
+    "言い換え（別名）": "4/4",
+    "言い換え（用語名なし）": "0/4",
+    "知らない語": "0/6",
+    "合計": "9/22",
+    "seconds": 216.0
+  },
+  "after": {
+    "label": "after",
+    "n": 22,
+    "同じ文": "2/8",
+    "言い換え（別名）": "1/4",
+    "言い換え（用語名なし）": "0/4",
+    "知らない語": "0/6",
+    "合計": "3/22",
+    "seconds": 92.7
+  },
+  "regressed": [],
+  "executed_training_myself": true
+}

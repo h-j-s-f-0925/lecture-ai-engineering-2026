@@ -1,0 +1,242 @@
+[
+  {
+    "kind": "same",
+    "term_id": "homework-levels",
+    "question": "「宿題の3レベル」とは何ですか？",
+    "must_include": [
+      "基礎",
+      "実装",
+      "発展"
+    ],
+    "search_result": "[{\"term\": \"宿題の3レベル\", \"lecture\": 1, \"definition\": \"AIE2026の宿題の構成。「基礎（講義内容の確認）」「実装（自分でコードを書く）」「発展（調査や試行）」の3段階があり、どれか1つに取り組めばその回の宿題は完了。原則として採点はしない。\", \"related\": [\"answer-md\"]}]"
+  },
+  {
+    "kind": "same",
+    "term_id": "answer-md",
+    "question": "「answer.md」とは何ですか？",
+    "must_include": [
+      "lectures",
+      "PR"
+    ],
+    "search_result": "[{\"term\": \"answer.md\", \"lecture\": 1, \"definition\": \"AIE2026で各回の演習・宿題の結果を書くファイル。lectures/NN/answer.md にあり、取り組んだレベル・やったこと・結果・気づきを記入して、作業ブランチから自分のforkの main へPRを出して提出する。\", \"related\": [\"pull-request\", \"homework-levels\"]}]"
+  },
+  {
+    "kind": "same",
+    "term_id": "lec-start-tag",
+    "question": "「lecNN-start タグ」とは何ですか？",
+    "must_include": [
+      "タグ",
+      "ブランチ"
+    ],
+    "search_result": "[{\"term\": \"lecNN-start タグ\", \"lecture\": 1, \"definition\": \"AIE2026の講座repoで、各回の演習開始時点のコードに付けているGitタグ（例：lec03-start）。前の回が終わっていなくても、このタグからブランチを作ればその回の演習を始められる。\", \"related\": [\"branch\"]}]"
+  },
+  {
+    "kind": "same",
+    "term_id": "default-model",
+    "question": "「既定モデル」とは何ですか？",
+    "must_include": [
+      "gemini-3.5-flash-lite"
+    ],
+    "search_result": "[{\"term\": \"既定モデル\", \"lecture\": 1, \"definition\": \"AIE2026の演習と宿題で標準に使うモデルは gemini-3.5-flash-lite。無料枠のレート制限と講座運営の安定性を考えて選んでいる。環境変数 AIE_MODEL で他のモデルに切り替えてよく、自分で契約したAPIを使ってもよい。\", \"related\": [\"rate-limit\", \"api-key\"]}]"
+  },
+  {
+    "kind": "same",
+    "term_id": "pi",
+    "question": "「Pi」とは何ですか？",
+    "must_include": [
+      "ターミナル",
+      "コーディングエージェント"
+    ],
+    "search_result": "用語集に「「Pi」とは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "same",
+    "term_id": "mcp-config",
+    "question": "「mcpServers設定」とは何ですか？",
+    "must_include": [
+      "mcp_servers.json"
+    ],
+    "search_result": "[{\"term\": \"MCP（Model Context Protocol）\", \"lecture\": 3, \"definition\": \"AIアプリと外部のツールやデータソースをつなぐためのオープンな標準プロトコル。MCPサーバーとして公開したツールは、対応する様々なエージェントやエディタ（MCPクライアント）から共通の方法で使える。第6回で、用語集の検索をMCPサーバーにして体験する。\", \"related\": [\"tool\", \"ai-agent\", \"mcp-server\", \"mcp-client\"]}, {\"term\": \"MCPサーバー\", \"lecture\": 6, \"definition\": \"MCPでツール（やリソース、プロンプト）を公開する側のプログラム。公開するのはツールの名前・説明文・引数のスキーマで、クライアントの要求に応じてツールを実行し結果を返す。本講座では用語集の検索をMCPサーバーにする（app/mcp_server.py）。公開されている既製のサーバー（fetch、filesystem、GitHubなど）も多い。\", \"related\": [\"mcp\", \"mcp-client\", \"mcp-transport\", \"fetch-server\"]}, {\"term\": \"mcpServers設定\", \"lecture\": 6, \"definition\": \"使うMCPサーバーを列挙する設定ファイル。サーバーごとに名前と、起動コマンド（stdio）または接続先URL（HTTP）を書く。Claude Desktop、Cursor、Pydantic AIなどが同じ mcpServers 形式を読む（VS Code / Copilot Chatは servers 形式）。本講座では app/mcp_servers.json。設定を数行足すだけでツールが増えるのがMCPの体験の核心。\", \"related\": [\"mcp-client\", \"tool-namespace\"]}]"
+  },
+  {
+    "kind": "same",
+    "term_id": "lora",
+    "question": "「LoRA」とは何ですか？",
+    "must_include": [
+      "行列",
+      "固定"
+    ],
+    "search_result": "[{\"term\": \"LoRA\", \"lecture\": 2, \"definition\": \"事前学習済みの重みは固定したまま、重みの更新分を2つの小さな行列の積（低ランク行列）で表し、その小さな行列だけを学習するPEFT手法。学習するパラメータが少なく、学習結果（アダプタ）も小さいファイルで保存できる。本講座の第2回演習ではLoRAを扱う。\", \"related\": [\"peft\", \"lora-rank\", \"qlora\"]}]"
+  },
+  {
+    "kind": "same",
+    "term_id": "temperature",
+    "question": "「temperature」とは何ですか？",
+    "must_include": [
+      "多様"
+    ],
+    "search_result": "[{\"term\": \"temperature\", \"lecture\": 1, \"definition\": \"次のトークンを選ぶときのランダムさを調整する設定値。低いほど出力が安定し、高いほど多様になる。同じ質問でも回答が変わる理由の一つ。\", \"related\": [\"llm\", \"evaluation-loop\"]}]"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "homework-levels",
+    "question": "AIE2026 の宿題レベルには何がありますか？",
+    "must_include": [
+      "基礎",
+      "実装",
+      "発展"
+    ],
+    "search_result": "[{\"term\": \"宿題の3レベル\", \"lecture\": 1, \"definition\": \"AIE2026の宿題の構成。「基礎（講義内容の確認）」「実装（自分でコードを書く）」「発展（調査や試行）」の3段階があり、どれか1つに取り組めばその回の宿題は完了。原則として採点はしない。\", \"related\": [\"answer-md\"]}]"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "default-model",
+    "question": "この講座のデフォルトモデルは何ですか？",
+    "must_include": [
+      "gemini-3.5-flash-lite"
+    ],
+    "search_result": "[{\"term\": \"既定モデル\", \"lecture\": 1, \"definition\": \"AIE2026の演習と宿題で標準に使うモデルは gemini-3.5-flash-lite。無料枠のレート制限と講座運営の安定性を考えて選んでいる。環境変数 AIE_MODEL で他のモデルに切り替えてよく、自分で契約したAPIを使ってもよい。\", \"related\": [\"rate-limit\", \"api-key\"]}]"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "lora",
+    "question": "Low-Rank Adaptation の仕組みを教えてください。",
+    "must_include": [
+      "行列",
+      "固定"
+    ],
+    "search_result": "[{\"term\": \"LoRA\", \"lecture\": 2, \"definition\": \"事前学習済みの重みは固定したまま、重みの更新分を2つの小さな行列の積（低ランク行列）で表し、その小さな行列だけを学習するPEFT手法。学習するパラメータが少なく、学習結果（アダプタ）も小さいファイルで保存できる。本講座の第2回演習ではLoRAを扱う。\", \"related\": [\"peft\", \"lora-rank\", \"qlora\"]}, {\"term\": \"ランク（LoRAのr）\", \"lecture\": 2, \"definition\": \"LoRAで使う低ランク行列の大きさを決めるハイパーパラメータ。大きいほど表現力が上がるが、学習するパラメータとメモリも増える。\", \"related\": [\"lora\"]}]"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "temperature",
+    "question": "温度パラメータを上げると、出力はどう変わりますか？",
+    "must_include": [
+      "多様"
+    ],
+    "search_result": "[{\"term\": \"temperature\", \"lecture\": 1, \"definition\": \"次のトークンを選ぶときのランダムさを調整する設定値。低いほど出力が安定し、高いほど多様になる。同じ質問でも回答が変わる理由の一つ。\", \"related\": [\"llm\", \"evaluation-loop\"]}]"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "answer-md",
+    "question": "AIE2026 で、各回の結果を書いて出すファイルは何ですか？",
+    "must_include": [
+      "lectures",
+      "PR"
+    ],
+    "search_result": "用語集に「AIE2026 で、各回の結果を書いて出すファイルは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "lec-start-tag",
+    "question": "前の回が終わっていなくても、次の回を始められる仕組みは何ですか？",
+    "must_include": [
+      "タグ",
+      "ブランチ"
+    ],
+    "search_result": "用語集に「前の回が終わっていなくても、次の回を始められる仕組みは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "pi",
+    "question": "2026 年 10 月に 1.0 が公開された、最小構成のエージェントは何ですか？",
+    "must_include": [
+      "ターミナル",
+      "コーディングエージェント"
+    ],
+    "search_result": "[{\"term\": \"AIエージェント\", \"lecture\": 3, \"definition\": \"LLMが自分で判断してツールを呼び出し、その結果を見てさらに次の行動を決める、というループで目的を達成するシステム。基本構造は「モデル＋ループ＋ツール」。\", \"related\": [\"agent-loop\", \"tool\", \"harness\"]}]"
+  },
+  {
+    "kind": "paraphrase",
+    "term_id": "mcp-config",
+    "question": "本講座で、使う MCP サーバーを書いておくファイルはどれですか？",
+    "must_include": [
+      "mcp_servers.json"
+    ],
+    "search_result": "[{\"term\": \"MCP（Model Context Protocol）\", \"lecture\": 3, \"definition\": \"AIアプリと外部のツールやデータソースをつなぐためのオープンな標準プロトコル。MCPサーバーとして公開したツールは、対応する様々なエージェントやエディタ（MCPクライアント）から共通の方法で使える。第6回で、用語集の検索をMCPサーバーにして体験する。\", \"related\": [\"tool\", \"ai-agent\", \"mcp-server\", \"mcp-client\"]}, {\"term\": \"MCPサーバー\", \"lecture\": 6, \"definition\": \"MCPでツール（やリソース、プロンプト）を公開する側のプログラム。公開するのはツールの名前・説明文・引数のスキーマで、クライアントの要求に応じてツールを実行し結果を返す。本講座では用語集の検索をMCPサーバーにする（app/mcp_server.py）。公開されている既製のサーバー（fetch、filesystem、GitHubなど）も多い。\", \"related\": [\"mcp\", \"mcp-client\", \"mcp-transport\", \"fetch-server\"]}]"
+  },
+  {
+    "kind": "unknown",
+    "term_id": null,
+    "question": "「lecNN-end タグ」とは何ですか？",
+    "must_any": [
+      "分かりません",
+      "わかりません",
+      "知りません",
+      "記載がありません",
+      "情報がありません",
+      "確認が必要"
+    ],
+    "search_result": "用語集に「「lecNN-end タグ」とは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "unknown",
+    "term_id": null,
+    "question": "「question.md」とは何ですか？",
+    "must_any": [
+      "分かりません",
+      "わかりません",
+      "知りません",
+      "記載がありません",
+      "情報がありません",
+      "確認が必要"
+    ],
+    "search_result": "用語集に「「question.md」とは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "unknown",
+    "term_id": null,
+    "question": "「宿題の応用レベル」とは何ですか？",
+    "must_any": [
+      "分かりません",
+      "わかりません",
+      "知りません",
+      "記載がありません",
+      "情報がありません",
+      "確認が必要"
+    ],
+    "search_result": "用語集に「「宿題の応用レベル」とは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "unknown",
+    "term_id": null,
+    "question": "「AIE2026の修了課題」とは何ですか？",
+    "must_any": [
+      "分かりません",
+      "わかりません",
+      "知りません",
+      "記載がありません",
+      "情報がありません",
+      "確認が必要"
+    ],
+    "search_result": "用語集に「「AIE2026の修了課題」とは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "unknown",
+    "term_id": null,
+    "question": "「AIE2026の講座バッジ」とは何ですか？",
+    "must_any": [
+      "分かりません",
+      "わかりません",
+      "知りません",
+      "記載がありません",
+      "情報がありません",
+      "確認が必要"
+    ],
+    "search_result": "用語集に「「AIE2026の講座バッジ」とは何ですか？」は見つかりませんでした。"
+  },
+  {
+    "kind": "unknown",
+    "term_id": null,
+    "question": "「AIE2026の週次チェックイン」とは何ですか？",
+    "must_any": [
+      "分かりません",
+      "わかりません",
+      "知りません",
+      "記載がありません",
+      "情報がありません",
+      "確認が必要"
+    ],
+    "search_result": "用語集に「「AIE2026の週次チェックイン」とは何ですか？」は見つかりませんでした。"
+  }
+]
